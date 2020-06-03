@@ -406,6 +406,42 @@ InputFilter::SwitchInDirectionAction::perform(const Event& event)
                                 Event::kDeliverImmediately));
 }
 
+InputFilter::CommandAction::CommandAction(
+    IEventQueue* events, std::string cmd) :
+    m_cmd(std::move(cmd)),
+    m_events(events)
+{
+    // do nothing
+}
+
+std::string
+InputFilter::CommandAction::getCmd() const
+{
+    return m_cmd;
+}
+
+InputFilter::Action*
+InputFilter::CommandAction::clone() const
+{
+    return new CommandAction(*this);
+}
+
+std::string
+InputFilter::CommandAction::format() const
+{
+    return barrier::string::sprintf("command(%s)", m_cmd.c_str());
+}
+
+void
+InputFilter::CommandAction::perform(const Event& event)
+{
+    Server::CommandActionInfo* info =
+        Server::CommandActionInfo::alloc(m_cmd);
+    m_events->addEvent(Event(m_events->forServer().commandAction(),
+        event.getTarget(), info,
+        Event::kDeliverImmediately));
+}
+
 InputFilter::KeyboardBroadcastAction::KeyboardBroadcastAction(
         IEventQueue* events, Mode mode) :
     m_mode(mode),

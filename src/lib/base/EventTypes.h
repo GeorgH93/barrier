@@ -433,6 +433,7 @@ public:
         m_disconnected(Event::kUnknown),
         m_switchToScreen(Event::kUnknown),
         m_switchInDirection(Event::kUnknown),
+        m_commandAction(Event::kUnknown),
         m_keyboardBroadcast(Event::kUnknown),
         m_lockCursorToScreen(Event::kUnknown),
         m_screenSwitched(Event::kUnknown) { }
@@ -478,6 +479,14 @@ public:
     */
     Event::Type        switchInDirection();
 
+    //! Get command action event type
+    /*!
+    Returns the command action event type.  The server responds to this
+    by executing the command/program/script.  The event data is a \c CommandActionInfo*
+    that indicates the command to run.
+    */
+    Event::Type        commandAction();
+
     //! Get keyboard broadcast event type
     /*!
     Returns the keyboard broadcast event type.  The server responds
@@ -509,6 +518,7 @@ private:
     Event::Type        m_disconnected;
     Event::Type        m_switchToScreen;
     Event::Type        m_switchInDirection;
+    Event::Type        m_commandAction;
     Event::Type        m_keyboardBroadcast;
     Event::Type        m_lockCursorToScreen;
     Event::Type        m_screenSwitched;

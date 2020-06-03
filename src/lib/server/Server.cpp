@@ -50,6 +50,7 @@
 #include <fstream>
 #include <ctime>
 #include <stdexcept>
+#include <stdio.h>
 //
 // Server
 //
@@ -166,6 +167,10 @@ Server::Server(
 							m_inputFilter,
 							new TMethodEventJob<Server>(this,
 								&Server::handleSwitchInDirectionEvent));
+    m_events->adoptHandler(m_events->forServer().commandAction(),
+                            m_inputFilter,
+                            new TMethodEventJob<Server>(this,
+                                &Server::handleCommandActionEvent));
 	m_events->adoptHandler(m_events->forServer().keyboardBroadcast(),
 							m_inputFilter,
 							new TMethodEventJob<Server>(this,
@@ -1424,6 +1429,15 @@ Server::handleSwitchInDirectionEvent(const Event& event, void*)
 }
 
 void
+Server::handleCommandActionEvent(const Event& event, void*)
+{
+    CommandActionInfo* info =
+        static_cast<CommandActionInfo*>(event.getData());
+	const int status = system(info->m_cmd);
+    LOG((CLOG_DEBUG1 "command(%s) resulted in %d", info->m_cmd, status));
+}
+
+void
 Server::handleKeyboardBroadcastEvent(const Event& event, void*)
 {
 	KeyboardBroadcastInfo* info = (KeyboardBroadcastInfo*)event.getData();
@@ -2332,6 +2346,20 @@ Server::SwitchInDirectionInfo::alloc(EDirection direction)
 		(SwitchInDirectionInfo*)malloc(sizeof(SwitchInDirectionInfo));
 	info->m_direction = direction;
 	return info;
+}
+
+
+//
+// Server::CommandActionInfo
+//
+
+Server::CommandActionInfo*
+Server::CommandActionInfo::alloc(const std::string& cmd)
+{
+    CommandActionInfo* info =
+        (CommandActionInfo*)malloc(sizeof(CommandActionInfo) + cmd.size());
+    strcpy(info->m_cmd, cmd.c_str());
+    return info;
 }
 
 //

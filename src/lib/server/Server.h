@@ -78,6 +78,14 @@ public:
         EDirection        m_direction;
     };
 
+    //! Command action data
+    class CommandActionInfo {
+    public:
+        static CommandActionInfo* alloc(const std::string& cmd);
+
+        char m_cmd[1];
+    };
+
     //! Screen connected data
     class ScreenConnectedInfo {
     public:
@@ -309,6 +317,7 @@ private:
     void                handleClientCloseTimeout(const Event&, void*);
     void                handleSwitchToScreenEvent(const Event&, void*);
     void                handleSwitchInDirectionEvent(const Event&, void*);
+    void                handleCommandActionEvent(const Event&, void*);
     void                handleKeyboardBroadcastEvent(const Event&,void*);
     void                handleLockCursorToScreenEvent(const Event&, void*);
     void                handleFakeInputBeginEvent(const Event&, void*);

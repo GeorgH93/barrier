@@ -182,6 +182,21 @@ public:
         EDirection                m_direction;
         IEventQueue*            m_events;
     };
+
+    class CommandAction : public Action {
+    public:
+        CommandAction(IEventQueue* events, std::string cmd);
+
+        std::string getCmd() const;
+
+        virtual Action* clone() const;
+        virtual std::string format() const;
+        virtual void perform(const Event&);
+
+    private:
+        std::string m_cmd;
+        IEventQueue* m_events;
+    };
     
     // KeyboardBroadcastAction
     class KeyboardBroadcastAction : public Action {
