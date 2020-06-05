@@ -24,7 +24,7 @@
 const char* Action::m_ActionTypeNames[] =
 {
     "keyDown", "keyUp", "keystroke",
-    "switchToScreen", "switchInDirection", "lockCursorToScreen",
+    "switchToScreen", "switchInDirection", "lockCursorToScreen", "command",
     "mouseDown", "mouseUp", "mousebutton"
 };
 
@@ -39,13 +39,14 @@ Action::Action() :
     m_SwitchDirection(switchLeft),
     m_LockCursorMode(lockCursorToggle),
     m_ActiveOnRelease(false),
-    m_HasScreens(false)
+    m_HasScreens(false),
+    m_Command()
 {
 }
 
 QString Action::text() const
 {
-    QString text = QString(m_ActionTypeNames[keySequence().isMouseButton() ? type() + 6 : type()  ]) + "(";
+    QString text = QString(m_ActionTypeNames[keySequence().isMouseButton() ? type() + 7 : type()  ]) + "(";
 
     switch (type())
     {
@@ -87,6 +88,11 @@ QString Action::text() const
             text += m_LockCursorModeNames[m_LockCursorMode];
             break;
 
+        case command:
+            // The server does not read actions without a parameter between the () correctly
+            text += m_Command.isEmpty() ? "echo \"nothing\"" : m_Command;
+            break;
+
         default:
             Q_ASSERT(0);
             break;
@@ -116,6 +122,7 @@ void Action::loadSettings(QSettings& settings)
     setLockCursorMode(settings.value("lockCursorToScreen", lockCursorToggle).toInt());
     setActiveOnRelease(settings.value("activeOnRelease", false).toBool());
     setHaveScreens(settings.value("hasScreens", false).toBool());
+    setCommandText(settings.value("command").toString());
 }
 
 void Action::saveSettings(QSettings& settings) const
@@ -136,6 +143,7 @@ void Action::saveSettings(QSettings& settings) const
     settings.setValue("lockCursorToScreen", lockCursorMode());
     settings.setValue("activeOnRelease", activeOnRelease());
     settings.setValue("hasScreens", haveScreens());
+    settings.setValue("command", commandText());
 }
 
 QTextStream& operator<<(QTextStream& outStream, const Action& action)
